@@ -10,6 +10,7 @@ import subprocess
 import traceback
 import xlsxwriter
 import unicodedata
+import numpy as np
 import pandas as pd
 from colorama import init
 init()
@@ -28,8 +29,8 @@ def menu(args):
 
     op2t.FOLDER_PDF = os.path.join(folder_pdf_path, folder_pdf_name)
     if not op2t.check_path(op2t.FOLDER_PDF):
-        op2t.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), op2t.FOLDER_PDF), showdate = False)
-        op2t.show_print("%s: error: the following arguments are required: -f/--folder_pdf" % os.path.basename(__file__), showdate = False)
+        op2t.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), op2t.FOLDER_PDF), showdate = False, font = oscihub.YELLOW)
+        op2t.show_print("%s: error: the following arguments are required: -f/--folder_pdf" % os.path.basename(__file__), showdate = False, font = oscihub.YELLOW)
         exit()
 
     if args.output is not None:
@@ -41,7 +42,7 @@ def menu(args):
         op2t.OUTPUT_PATH = os.path.join(output_path, output_name)
         created = op2t.create_directory(op2t.OUTPUT_PATH)
         if not created:
-            op2t.show_print("%s: error: Couldn't create folder '%s'" % (os.path.basename(__file__), op2t.OUTPUT_PATH), showdate = False)
+            op2t.show_print("%s: error: Couldn't create folder '%s'" % (os.path.basename(__file__), op2t.OUTPUT_PATH), showdate = False, font = oscihub.YELLOW)
             exit()
     else:
         op2t.OUTPUT_PATH = os.getcwd().strip()
@@ -236,7 +237,8 @@ class Pdf2Txt:
         dict_pdf = {}
         if self.check_path(self.XLS_FILE):
             df = pd.read_excel(io = self.XLS_FILE, sheet_name = self.XLS_SHEET_DETAIL)
-            df = df.where(pd.notnull(df), None)
+            # df = df.where(pd.notnull(df), None)
+            df = df.replace({np.nan: None})
 
             for idx, row in df.iterrows():
                 if row[self.xls_col_download] == self.STATUS_OK:
